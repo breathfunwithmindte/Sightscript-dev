@@ -17,7 +17,7 @@ anna = <: dasdasd :>
  state.User = { new: Func, register: Func }
 
  User = struct(
-    username string
+    username stringd
     password string
     age number
  )
