@@ -34,6 +34,13 @@ module.exports = class SightScript extends Executor {
     this.executables = this.compiler.main_compile(this.objects, this.tokens, true)
 
     console.table(this.executables);
+
+    /**
+     * @type {list<string>}
+     * runtime errors like variable not found, method not envoiked, function not exist;
+     */
+    this.runtime_errors = new Array();
+
     // console.log(this);
     //delete this.tokens;
     // runtime, system, dynamic

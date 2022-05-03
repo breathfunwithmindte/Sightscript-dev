@@ -95,7 +95,7 @@ module.exports = class Parser {
     try {
       if (!tokens.has(line)) { /* todo push error message; <maybe>return -1;*/}
       const code = tokens.get(line);
-      console.log(code);
+      // ! console.log(code);
       const [name_props, code_id] = code.split("__CODE__");
       let code_block = tokens.get("__CODE__" + code_id.trim());
       code_block = code_block.trim().substring(1, code_block.length - 1);

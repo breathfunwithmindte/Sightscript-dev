@@ -1,6 +1,7 @@
 const Parsed = require("../types/Parsed");
 module.exports = class Compiler {
   #functions = require("./helpers/index");
+  #reader = require("./helpers/Reader");
   #tokens;
   tests = []
   /**
@@ -68,7 +69,7 @@ module.exports = class Compiler {
   {
     // todo variable with operators, expressions //
     if(typeof value === "string") {
-      console.log("@@", value)
+      // !debug console.log("@@", value)
       if(value.startsWith("__STRING__")) {
         const v = this.#tokens.get(value);
         return { type: "variable-string", value: v.substring(1, v.length - 1), ready: true }
@@ -97,6 +98,61 @@ module.exports = class Compiler {
       }
       return { type: "variable", value: value, ready: false }
     }
+  }
+
+  getProps (type, props, sp_state, g_state)
+  {
+    if(type === "values") return this.compile_props_variables(props, sp_state, g_state);
+    return this.compile_props_variables_struct(props, sp_state, g_state);
+  }
+
+  compile_props_variables (props, sp_state, g_state) 
+  {
+    let props_values = new Array();
+    if(props === "") return [];
+    props.split(",").map(i => {
+      const v_object = this.#compile_datatype(i);
+      if(v_object.type === "variable-string" || v_object.type === "variable-number"){
+        props_values.push(typeof v_object.value === "string" ? v_object.value.trim() : v_object.value);
+      }else if (v_object.type === "variable"){
+        props_values.push(this.#reader(v_object.value.trim(), sp_state, {...g_state}));
+      }
+      console.log(v_object)
+    });
+    return props_values;
+  }
+
+  /**
+   * 
+   * @param {string} props 
+   * @param {object} sp_state 
+   * @param {object} g_state 
+   * @returns {list<object>}
+   * todo maybe find better solution, bad but working code.
+   */
+  compile_props_variables_struct (props, sp_state, g_state) 
+  {
+    let props_values = new Array();
+    props.split(/\r?\n/).map(i => {
+      i = i.trim();
+      if(i === "") return;
+      const obj = new Object(); const arr = i.split(" ").filter(f => f !== "");
+      obj["property"] = arr[0]; obj["type"] = arr[1] || "string";
+      arr.slice(2, arr.length).map(i => { 
+        const [n, v] = i.split("::"); const av = this.#props_variables_struct_get_value(v)
+        obj[n] = av === undefined ? true : av; 
+      })
+      props_values.push(obj);
+    });
+    return props_values;
+  }
+
+  #props_variables_struct_get_value (v) {
+    if(!v) return undefined;
+    if(v === "true" || v === "TRUE") return true;
+    if(v === "false" || v === "FALSE") return false; 
+    if(!isNaN(Number(v))) return Number(v);
+    return v; 
   }
   
   

@@ -1,4 +1,5 @@
 const print = require("./print");
+const struct = require("./struct");
 
 /**
  * @type {Map <string, object>}
@@ -6,8 +7,7 @@ const print = require("./print");
 const functions = new Map();
 
 functions.set("print", print);
-
-console.log(print)
+functions.set("struct", struct);
 
 
 module.exports = functions;

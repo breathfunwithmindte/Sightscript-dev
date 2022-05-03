@@ -1,5 +1,6 @@
 const Func = require("../types/Func");
 const Parsed = require("../types/Parsed");
+const Parser = require("../parser/Parser");
 
 module.exports = new Func({
   func_name: "print",
@@ -9,15 +10,10 @@ module.exports = new Func({
    */
   func_exe: async function (current, sp_state) {
     const { self } = this;
-    self.state.smth = {
-      username: "Mike", new: new Func({
-        func_name: "print",
-        prop_type: "values",
-        func_exe: async function () {
-
-        }
-      })
-    }
-    //console.log(current, sp_state);
+    const props = self.compiler.compile_props_variables(current.props, sp_state, self.state);
+    console.log("~~~~~")
+    console.log(...props);
+    console.log("~~~~~")
+    return undefined;
   } 
 })

@@ -1,7 +1,7 @@
 module.exports = class Parsed {
   constructor(props) {
     props = typeof props === "string" ? Parsed.ErrorProps(props) : props;
-    this.propss = props;
+    // !debug this.propss = props;
     /**
      * @type {number}
      * @description // status if something went wrong status equals to -1;

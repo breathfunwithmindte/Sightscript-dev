@@ -1,4 +1,5 @@
 const Tokenizer = require("../tokenizer/Tokenizer");
+const Func = require("../types/Func");
 const Parsed = require("../types/Parsed");
 const Writter = require("./Writter");
 
@@ -28,7 +29,19 @@ module.exports = class Executor extends Tokenizer {
       if(current.type === "function-exe")
       {
         await this.#executeFunction(current, sp_state);
-        //console.log(current);
+      }
+      if(current.type === "variable-function-exe")
+      {
+        await this.#executeVariableFunction(current, sp_state);
+      }
+      if(current.type === "variable-method-exe")
+      {
+        await this.#executeVariableMethod(current, sp_state);
+      }
+      if(current.type === "ifstatement")
+      {
+        // check before run if statement
+        console.log(await this.primary_execute(current.codeblock))
       }
       
     }
@@ -49,6 +62,11 @@ module.exports = class Executor extends Tokenizer {
     Writter(sp_state, this.state, current.name, current.value);
   }
 
+  writeSomething (name, value, sp_state)
+  {
+    Writter(sp_state, this.state, name, value);
+  }
+
   /**
    * 
    * @param {Parsed} current 
@@ -63,11 +81,41 @@ module.exports = class Executor extends Tokenizer {
 
   async #executeFunction (current, sp_state)
   {
-    if(current.name.split(".").length === 1) {
-      if(!this.functions.has(current.name)) return console.log("function not found with this name !!!");
-      const func = this.functions.get(current.name);
+    if(!this.functions.has(current.name)) return console.log("function not found with this name !!!");
+    const func = this.functions.get(current.name);
+    try{
       await func.exe(this, current, sp_state);
+    }catch(err){
+      console.log(err);
+    }
+  }
 
+  async #executeVariableFunction (current, sp_state)
+  {
+    if(!this.functions.has(current.value)) return console.log("function not found with this name !!!");
+    const func = this.functions.get(current.value);
+    try{
+      const r = await func.exe(this, current, sp_state);
+      if(r === undefined) return;
+      Writter(sp_state, this.state, current.name, r);
+    }catch(err){
+      console.log(err);
+    }
+  }
+
+  async #executeVariableMethod (current, sp_state)
+  {
+    const [object_before, method_name] = current.value.split("::");
+    const actual_value = this.#getValue(sp_state, object_before.trim());
+    if(!actual_value) return console.log("no value"); // todo do smth with the error //;
+    if(actual_value[method_name] instanceof Func) {
+      try{
+        console.log(await actual_value[method_name].exe(this, current, sp_state))
+      }catch(err){
+        console.log(err);
+      }
+    }else{
+      // todo do smth with the error //
     }
   }
 

@@ -9,7 +9,7 @@ const ss = new SightScript({
 
 (async () => {
   const result = await ss.execute();
-  console.log("primary execute = ", JSON.stringify(result))
+  console.log("primary execute = ", result)
 })()
 
 

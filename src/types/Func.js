@@ -51,7 +51,7 @@ module.exports = class Func {
 
   async exe (instance, current, sp_state)
   {
-    const newfunc = this.func_exe.bind({ self: instance });
+    const newfunc = this.func_exe.bind({ self: instance, func: this });
     return await newfunc(current, sp_state);
   }
   
